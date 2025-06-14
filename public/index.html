@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>IP Submitter</title>
+</head>
+
+<body>
+    <h2>Your IP Info</h2>
+    <form id="ipForm">
+        <p><strong>IP Address:</strong> <span id="ip"></span></p>
+        <input type="hidden" name="ip_address" id="ip_address">
+        <input type="submit" value="Submit to DB" id="submitip">
+    </form>
+
+    <script>
+        fetch("https://api.ipify.org?format=json")
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("ip").textContent = data.ip;
+                document.getElementById("ip_address").value = data.ip;
+            });
+
+        document.getElementById("ipForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const ip = document.getElementById("ip_address").value;
+            const userAgent = navigator.userAgent;
+
+            const res = await fetch("/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ip_address: ip, user_agent: userAgent })
+            });
+
+            const result = await res.json();
+            console.log(result.message);
+        });
+    </script>
+</body>
+
+</html>
